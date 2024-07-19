@@ -18,7 +18,7 @@ import torch.optim as optim
 path1 = r'C:/Users/minjeong/Documents/itwill/Video_Detection/detection/Pytorch/dataset/'
 x_train = np.load(path1 + 'x_train.npy').astype(np.float32)  # (2586, 26, 34, 1)
 y_train = np.load(path1 + 'y_train.npy').astype(np.float32)  # (2586, 1)
-
+x_train.shape
 train_transform = transforms.Compose([
     transforms.ToTensor(),
     transforms.RandomRotation(10),

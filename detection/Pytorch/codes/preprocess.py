@@ -31,10 +31,10 @@ sns.distplot(y, kde=False)
 
 # 전처리 
 n_total = len(X)
-X_result = np.empty((n_total, 26, 34, 1))
+X_result = np.empty((n_total, 26, 34, 1)) 
 
 for i, x in enumerate(X):
-    img = x.reshape((26, 34, 1))
+    img = x.reshape((26, 34, 1)) # # gray scaling
     
     X_result[i] = img
     

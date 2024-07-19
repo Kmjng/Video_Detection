@@ -58,6 +58,9 @@ def predict(pred):
 video_path = 'C:/Users/minjeong/Documents/itwill/Video_Detection/detection/Pytorch/videos/1.mp4'
 cap = cv2.VideoCapture(video_path)
 
+# GIF 저장을 위한 프레임 리스트
+frames = []
+
 while cap.isOpened():
     ret, img_ori = cap.read()
     if not ret:
@@ -114,7 +117,8 @@ while cap.isOpened():
         
         
         
-        
+    # 프레임을 리스트에 추가
+    frames.append(cv2.cvtColor(img, cv2.COLOR_BGR2RGB))    
         
     cv2.imshow('result', img)
     if cv2.waitKey(1) == ord('q'):
@@ -125,6 +129,12 @@ cv2.destroyAllWindows()
 
 
 
+# GIF로 저장
+import imageio
+gif_path = 'C:/Users/minjeong/Documents/itwill/Video_Detection/detection/Pytorch/videos/output.gif'
+with imageio.get_writer(gif_path, mode='I', duration=0.1) as writer:
+    for frame in frames:
+        writer.append_data(frame)
 
 
 
