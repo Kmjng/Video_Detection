@@ -8,7 +8,7 @@ Created on Wed Jul 17 17:55:44 2024
 
 import torch.nn as nn
 import torch.nn.functional as F
-# from torchsummary import summary
+from torchsummary import summary
 
 # model 
 class Net(nn.Module):
@@ -33,6 +33,6 @@ class Net(nn.Module):
         return x
 
 
-
-model = Net().to('cuda')
+model = Net().to('cpu')
+# model = Net().to('cuda')
 #  summary(model, (1,26,34))

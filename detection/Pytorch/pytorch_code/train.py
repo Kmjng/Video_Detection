@@ -15,13 +15,15 @@ from data_loader import eyes_dataset
 from model import Net
 import torch.optim as optim
 
-x_train = np.load('./dataset/x_train.npy').astype(np.float32)  # (2586, 26, 34, 1)
-y_train = np.load('./dataset/y_train.npy').astype(np.float32)  # (2586, 1)
+path1 = r'C:/Users/minjeong/Documents/itwill/Video_Detection/detection/Pytorch/dataset/'
+x_train = np.load(path1 + 'x_train.npy').astype(np.float32)  # (2586, 26, 34, 1)
+y_train = np.load(path1 + 'y_train.npy').astype(np.float32)  # (2586, 1)
 
 train_transform = transforms.Compose([
     transforms.ToTensor(),
     transforms.RandomRotation(10),
-    transforms.RandomHorizontalFlip(),
+    transforms.RandomHorizontalFlip(), #모델 일반화 능력 향상시키기 위함
+
 ])
 
 train_dataset = eyes_dataset(x_train, y_train, transform=train_transform)
@@ -53,12 +55,12 @@ def accuracy(y_pred, y_test):
 
 
     
-PATH = 'weights/trained.pth'
+PATH = 'C:/Users/minjeong/Documents/itwill/Video_Detection/detection/Pytorch/pytorch_code/weights/trained.pth'
 
 train_dataloader = DataLoader(train_dataset, batch_size=32, shuffle=True, num_workers=4)
 
 model = Net()
-model.to('cuda')
+model.to('cpu')
 
 criterion = nn.BCEWithLogitsLoss()
 optimizer = optim.Adam(model.parameters(), lr=0.0001)
@@ -72,7 +74,7 @@ for epoch in range(epochs):
     model.train()
 
     for i, data in enumerate(train_dataloader, 0):
-        input_1, labels = data[0].to('cuda'), data[1].to('cuda')
+        input_1, labels = data[0].to('cpu'), data[1].to('cpu')
 
         input = input_1.transpose(1, 3).transpose(2, 3)
 
