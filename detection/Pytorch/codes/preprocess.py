@@ -13,7 +13,7 @@ import os, glob, cv2, random
 import seaborn as sns
 import pandas as pd
 
-base_path = 'C:/Users/minjeong/Documents/itwill/Video_Detection/detection/Pytorch/dataset/'
+base_path = 'C:/ITWILL/Video_Detection/detection/Pytorch/dataset/'
 
 X, y = read_csv(os.path.join(base_path, 'dataset.csv'))
 

@@ -69,11 +69,11 @@ while cap.isOpened():
     img_ori = cv2.resize(img_ori, dsize=(0, 0), fx=0.5, fy=0.5)
 
     img = img_ori.copy()
-    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY) 
 
-    faces = detector(gray)
+    faces = detector(gray) # dlib의 얼굴검출기로 grayscale 이미지에서 얼굴 검출
 
-    for face in faces:
+    for face in faces:  # 얼굴 랜드마크 검출 및 눈 영역 추출
         shapes = predictor(gray, face)
         shapes = face_utils.shape_to_np(shapes)
 
@@ -84,6 +84,8 @@ while cap.isOpened():
         eye_img_r = cv2.resize(eye_img_r, dsize=IMG_SIZE)
         eye_img_r = cv2.flip(eye_img_r, flipCode=1)
 
+        # 모델 예측
+        # 눈 이미지 데이터 Pytorch 텐서로 변호나 후 모델 입력
         eye_input_l = eye_img_l.copy().reshape((1, IMG_SIZE[1], IMG_SIZE[0], 1)).astype(np.float32)
         eye_input_r = eye_img_r.copy().reshape((1, IMG_SIZE[1], IMG_SIZE[0], 1)).astype(np.float32)
 
@@ -93,6 +95,8 @@ while cap.isOpened():
         pred_l = predict(eye_input_l)
         pred_r = predict(eye_input_r)
 
+        # 예측 결과 처리 및 시각화 
+        #예측 결과를 바탕으로 눈 감김 상태를 체크하고 특정 조건을 만족하면 경고 메시지를 화면에 출력
         if pred_l.item() == 0.0 and pred_r.item() == 0.0:
             n_count += 1
         else:
@@ -120,7 +124,7 @@ while cap.isOpened():
     # 프레임을 리스트에 추가
     frames.append(cv2.cvtColor(img, cv2.COLOR_BGR2RGB))    
         
-    cv2.imshow('result', img)
+    cv2.imshow('result', img) # 결과 프레임을 화면에 표시
     if cv2.waitKey(1) == ord('q'):
         break
 

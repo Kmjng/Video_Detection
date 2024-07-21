@@ -13,11 +13,11 @@ from keras.models import Model, load_model
 from keras.preprocessing.image import ImageDataGenerator
 from keras.callbacks import ModelCheckpoint, ReduceLROnPlateau
 plt.style.use('dark_background')
-
-x_train = np.load('C:/Users/minjeong/Documents/itwill/Video_Detection/detection/Pytorch/dataset/x_train.npy').astype(np.float32)
-y_train = np.load('C:/Users/minjeong/Documents/itwill/Video_Detection/detection/Pytorch/dataset/y_train.npy').astype(np.float32)
-x_val = np.load('C:/Users/minjeong/Documents/itwill/Video_Detection/detection/Pytorch/dataset/x_val.npy').astype(np.float32)
-y_val = np.load('C:/Users/minjeong/Documents/itwill/Video_Detection/detection/Pytorch/dataset/y_val.npy').astype(np.float32)
+path1 = r'C:/ITWILL/Video_Detection/detection/Pytorch/dataset/'
+x_train = np.load(path1+ 'x_train.npy').astype(np.float32)
+y_train = np.load(path1+ 'y_train.npy').astype(np.float32)
+x_val = np.load(path1+ 'x_val.npy').astype(np.float32)
+y_val = np.load(path1+ 'y_val.npy').astype(np.float32)
 
 print(x_train.shape, y_train.shape)
 print(x_val.shape, y_val.shape)
