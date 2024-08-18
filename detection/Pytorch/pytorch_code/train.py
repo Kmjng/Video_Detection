@@ -29,6 +29,7 @@ train_transform = transforms.Compose([
 train_dataset = eyes_dataset(x_train, y_train, transform=train_transform)
 
 # --------데이터 출력----------
+'''
 plt.style.use('dark_background')
 fig = plt.figure()
 
@@ -40,7 +41,7 @@ for i in range(len(train_dataset)):
     plt.imshow(x_train[i].reshape((26, 34)), cmap='gray')
 
     plt.show()
-    
+    '''
     
     
 # accuracy 함수
