@@ -16,25 +16,29 @@ from imutils import face_utils
 import os
 import time
 import winsound  
-
+import threading  # 추가된 모듈 (winsound를 프로그램과 비동기식으로 실행하기 위해 추가)
 
 
 IMG_SIZE = (34,26)
-PATH = 'C:/Users/minjeong/Documents/itwill/Video_Detection/detection/Pytorch/pytorch_code/weights/trained.pth'
-ALERT_FILE = 'C:/Users/minjeong/Documents/itwill/Video_Detection/detection/Pytorch/message'
-ALERT_SOUND = 'C:/Users/minjeong/Documents/itwill/Video_Detection/detection/Pytorch/sound/notify.wav'
+#PATH = 'C:/Users/minjeong/Documents/itwill/Video_Detection/detection/Pytorch/pytorch_code/weights/trained.pth'
+#ALERT_FILE = 'C:/Users/minjeong/Documents/itwill/Video_Detection/detection/Pytorch/message'
+#ALERT_SOUND = 'C:/Users/minjeong/Documents/itwill/Video_Detection/detection/Pytorch/sound/notify.wav'
+
+PATH = 'C:/ITWILL/Video_Detection/detection/Pytorch/pytorch_code/weights/cnn_train.pth'
+ALERT_FILE =  'C:/ITWILL/Video_Detection/detection/Pytorch/message'
+ALERT_SOUND = 'C:/ITWILL/Video_Detection/detection/Pytorch/sound/notify.wav'
+
 
 detector = dlib.get_frontal_face_detector()
-predictor = dlib.shape_predictor('C:/Users/minjeong/Documents/itwill/data/shape_predictor_68_face_landmarks.dat/shape_predictor_68_face_landmarks.dat')
+#predictor = dlib.shape_predictor('C:/Users/minjeong/Documents/itwill/data/shape_predictor_68_face_landmarks.dat/shape_predictor_68_face_landmarks.dat')
+predictor = dlib.shape_predictor('C:/ITWILL/Video_Detection/detection/shape_predictor_68_face_landmarks.dat')
 
 model = Net()
 model.load_state_dict(torch.load(PATH))
 model.eval()
 
-n_count = 0
 
-# (추가) 
-last_alert_time = time.time()
+
 
 
 def crop_eye(img, eye_points):
@@ -72,7 +76,7 @@ def predict(pred):
 def save_alert_to_file(message, folder_path):
     if not os.path.exists(folder_path):
         os.makedirs(folder_path)
-    with open(os.path.join(folder_path, '/alert.txt'), 'a') as file: 
+    with open(os.path.join(folder_path, 'alert.txt'), 'a') as file: 
         file.write(message + '\n')
 
 # 3초 이상 눈 감는 경우 경고음 실행
@@ -81,12 +85,13 @@ def play_alert_sound():
 #---(추가)-----
 
 
-
-
+n_count = 0
+alert_playing = False  # 알람이 울리는 상태를 추적하기 위한 변수
 
 
 # 비디오 캡처 객체를 저장된 비디오 파일로 초기화
-video_path = 'C:/Users/minjeong/Documents/itwill/Video_Detection/detection/Pytorch/videos/1.mp4'
+#video_path = 'C:/Users/minjeong/Documents/itwill/Video_Detection/detection/Pytorch/videos/1.mp4'
+video_path = 'C:/ITWILL/Video_Detection/detection/Pytorch/videos/3.mp4'
 cap = cv2.VideoCapture(video_path)
 
 # GIF 저장을 위한 프레임 리스트
@@ -137,20 +142,18 @@ while cap.isOpened():
             # (추가)
             eyes_detected = True
         else:
-            n_count = 0
-
-        if n_count > 100:
-            cv2.putText(img, "Wake up", (120, 160), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2)
-            # ----(추가)----
-            cv2.rectangle(img, pt1=tuple(eye_rect_l[0:2]), pt2=tuple(eye_rect_l[2:4]), color=(0, 0, 255), thickness=2)
-            cv2.rectangle(img, pt1=tuple(eye_rect_r[0:2]), pt2=tuple(eye_rect_r[2:4]), color=(0, 0, 255), thickness=2)
-            if (time.time() - last_alert_time) > 3:
-                play_alert_sound()
-                last_alert_time = time.time()
-        else:
-            cv2.rectangle(img, pt1=tuple(eye_rect_l[0:2]), pt2=tuple(eye_rect_l[2:4]), color=(255, 255, 255), thickness=2)
-            cv2.rectangle(img, pt1=tuple(eye_rect_r[0:2]), pt2=tuple(eye_rect_r[2:4]), color=(255, 255, 255), thickness=2)
-        # ----(추가)----
+            n_count = 0 # 프레임 카운트 초기화 
+            # (추가)
+            alert_playing = False  # 눈을 떴을 때 알람 상태 초기화
+            
+        if n_count > 90:
+            if not alert_playing:  # 알람이 울리지 않는 상태에서만 실행
+                cv2.putText(img, "Wake up", (120, 160), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2)
+                # ----(추가)----
+                #play_alert_sound()
+                threading.Thread(target=play_alert_sound).start()  # 알람을 비동기적으로 실행
+                alert_playing = True  # 알람 상태를 활성화
+                # ----(추가)----
         
         # visualize
         state_l = 'O %.1f' if pred_l > 0.1 else '- %.1f'
@@ -159,11 +162,23 @@ while cap.isOpened():
         state_l = state_l % pred_l
         state_r = state_r % pred_r
         
-        cv2.rectangle(img, pt1=tuple(eye_rect_l[0:2]), pt2=tuple(eye_rect_l[2:4]), color=(255,255,255), thickness=2)
-        cv2.rectangle(img, pt1=tuple(eye_rect_r[0:2]), pt2=tuple(eye_rect_r[2:4]), color=(255,255,255), thickness=2)
+        #cv2.rectangle(img, pt1=tuple(eye_rect_l[0:2]), pt2=tuple(eye_rect_l[2:4]), color=(255,255,255), thickness=2)
+        #cv2.rectangle(img, pt1=tuple(eye_rect_r[0:2]), pt2=tuple(eye_rect_r[2:4]), color=(255,255,255), thickness=2)
+        if n_count > 90:
+            cv2.rectangle(img, pt1=tuple(eye_rect_l[0:2]), pt2=tuple(eye_rect_l[2:4]), color=(0,0,255), thickness=2)
+            cv2.rectangle(img, pt1=tuple(eye_rect_r[0:2]), pt2=tuple(eye_rect_r[2:4]), color=(0,0,255), thickness=2)
+            cv2.putText(img, state_l, tuple(eye_rect_l[0:2]), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0,0,255), 2)
+            cv2.putText(img, state_r, tuple(eye_rect_r[0:2]), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0,0,255), 2)
 
-        cv2.putText(img, state_l, tuple(eye_rect_l[0:2]), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (255,255,255), 2)
-        cv2.putText(img, state_r, tuple(eye_rect_r[0:2]), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (255,255,255), 2)
+        else : 
+            cv2.rectangle(img, pt1=tuple(eye_rect_l[0:2]), pt2=tuple(eye_rect_l[2:4]), color=(255,255,255), thickness=2)
+            cv2.rectangle(img, pt1=tuple(eye_rect_r[0:2]), pt2=tuple(eye_rect_r[2:4]), color=(255,255,255), thickness=2)
+            cv2.putText(img, state_l, tuple(eye_rect_l[0:2]), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (255,255,255), 2)
+            cv2.putText(img, state_r, tuple(eye_rect_r[0:2]), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (255,255,255), 2)
+
+            
+        #cv2.putText(img, state_l, tuple(eye_rect_l[0:2]), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (255,255,255), 2)
+        #cv2.putText(img, state_r, tuple(eye_rect_r[0:2]), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (255,255,255), 2)
 
     # ----(추가)-----
     if not eyes_detected:

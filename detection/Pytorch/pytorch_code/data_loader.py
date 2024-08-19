@@ -10,9 +10,7 @@ Created on Wed Jul 17 17:42:26 2024
 from torch.utils.data import Dataset
 import torch
 
-# data_loader 
-
-
+# data_loader
 
 class eyes_dataset(Dataset): # 사용자 정의 데이터셋 만들기 
     def __init__(self, x_file_paths, y_file_path, transform=None):
