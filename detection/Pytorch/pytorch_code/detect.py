@@ -6,13 +6,12 @@ Created on Wed Jul 17 17:59:01 2024
 """
 
 import cv2
-import dlib
+import dlib 
 import numpy as np
 from model import Net
 import torch
 from imutils import face_utils
 
-# 추가한 코드 
 import os
 import time
 import winsound  
@@ -28,17 +27,14 @@ PATH = 'C:/ITWILL/Video_Detection/detection/Pytorch/pytorch_code/weights/cnn_tra
 ALERT_FILE =  'C:/ITWILL/Video_Detection/detection/Pytorch/message'
 ALERT_SOUND = 'C:/ITWILL/Video_Detection/detection/Pytorch/sound/notify.wav'
 
-
-detector = dlib.get_frontal_face_detector()
+ 
+detector = dlib.get_frontal_face_detector() # 얼굴을 검출하는 dlib의 얼굴 검출기.
 #predictor = dlib.shape_predictor('C:/Users/minjeong/Documents/itwill/data/shape_predictor_68_face_landmarks.dat/shape_predictor_68_face_landmarks.dat')
 predictor = dlib.shape_predictor('C:/ITWILL/Video_Detection/detection/shape_predictor_68_face_landmarks.dat')
-
+# 얼굴의 랜드마크를 예측하는 dlib의 랜드마크 예측기
 model = Net()
 model.load_state_dict(torch.load(PATH))
 model.eval()
-
-
-
 
 
 def crop_eye(img, eye_points):
@@ -63,9 +59,7 @@ def crop_eye(img, eye_points):
 
 def predict(pred):
   pred = pred.transpose(1, 3).transpose(2, 3)
-
   outputs = model(pred)
-
   pred_tag = torch.round(torch.sigmoid(outputs))
 
   return pred_tag
@@ -115,7 +109,8 @@ while cap.isOpened():
     for face in faces:  # 얼굴 랜드마크 검출 및 눈 영역 추출
         shapes = predictor(gray, face)
         shapes = face_utils.shape_to_np(shapes)
-
+        
+        # 눈의 랜드마크 좌표를 기반으로 눈 영역 crop
         eye_img_l, eye_rect_l = crop_eye(gray, eye_points=shapes[36:42])
         eye_img_r, eye_rect_r = crop_eye(gray, eye_points=shapes[42:48])
 
@@ -124,19 +119,19 @@ while cap.isOpened():
         eye_img_r = cv2.flip(eye_img_r, flipCode=1)
 
         # 모델 예측
-        # 눈 이미지 데이터 Pytorch 텐서로 변호나 후 모델 입력
+        # 눈 이미지 데이터 Pytorch 텐서로 변환 후 모델 입력
         eye_input_l = eye_img_l.copy().reshape((1, IMG_SIZE[1], IMG_SIZE[0], 1)).astype(np.float32)
         eye_input_r = eye_img_r.copy().reshape((1, IMG_SIZE[1], IMG_SIZE[0], 1)).astype(np.float32)
 
         eye_input_l = torch.from_numpy(eye_input_l)
         eye_input_r = torch.from_numpy(eye_input_r)
-
-        pred_l = predict(eye_input_l)
-        pred_r = predict(eye_input_r)
+        
+        # 예측 결과 반환
+        pred_l = predict(eye_input_l) # 왼눈 
+        pred_r = predict(eye_input_r) # 오른눈 
 
         # 예측 결과 처리 및 시각화 
-        #예측 결과를 바탕으로 눈 감김 상태를 체크하고 특정 조건을 만족하면 경고 메시지를 화면에 출력
-        # pred_l, pred_r 이 왼쪽눈 오른쪽 눈
+        # 예측 결과를 바탕으로 눈 감김 상태를 체크하고 특정 조건을 만족하면 경고 메시지를 화면에 출력
         if pred_l.item() == 0.0 and pred_r.item() == 0.0:
             n_count += 1
             # (추가)
@@ -146,7 +141,7 @@ while cap.isOpened():
             # (추가)
             alert_playing = False  # 눈을 떴을 때 알람 상태 초기화
             
-        if n_count > 90:
+        if n_count > 90: # 90 프레임 (~3초)
             if not alert_playing:  # 알람이 울리지 않는 상태에서만 실행
                 cv2.putText(img, "Wake up", (120, 160), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2)
                 # ----(추가)----

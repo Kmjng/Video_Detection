@@ -12,17 +12,17 @@ import torch
 
 # data_loader
 
-class eyes_dataset(Dataset): # 사용자 정의 데이터셋 만들기 
+class eyes_dataset(Dataset): # eyes_dataset 클래스 정의
     def __init__(self, x_file_paths, y_file_path, transform=None):
         self.x_files = x_file_paths
         self.y_files = y_file_path
-        self.transform = transform # 이미지 데이터 x_files 를 Pytorch 텐서로 변환 
+        self.transform = transform # 이미지에 적용할 변환(transform)
 
     def __getitem__(self, idx):
         x = self.x_files[idx] #  idx 위치에 있는 데이터 항목을 반환
-        x = torch.from_numpy(x).float()  # 데이터 항목 텐서화 
+        x = torch.from_numpy(x).float()  # 데이터 항목 텐서화 (numpy -> Pytorch Tensor) 
         y = self.y_files[idx] #  idx 위치에 있는 레이블을 반환
-        y = torch.from_numpy(y).float() # 레이블 항목 텐서화 
+        y = torch.from_numpy(y).float() # 레이블 항목 텐서화 (numpy -> Pytorch Tensor) 
 
         return x, y
 

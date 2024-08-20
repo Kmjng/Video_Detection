@@ -46,10 +46,10 @@ test_dataloader = DataLoader(test_dataset, batch_size=1, shuffle=False, num_work
 
 model = Net()
 model.to('cuda')
-model.load_state_dict(torch.load(PATH))
-model.eval()
+model.load_state_dict(torch.load(PATH)) # train된 모델의 가중치 로드
+model.eval() # 평가 모드 
 
-count = 0
+count = 0 # 배치 수 count
 
 with torch.no_grad():
     total_acc = 0.0
