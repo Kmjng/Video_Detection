@@ -10,7 +10,11 @@ import torch.nn as nn
 import torch.nn.functional as F
 from torchsummary import summary
 
-# model 
+
+##########
+# model 1
+##########
+
 class Net(nn.Module):
     def __init__(self):
         super(Net, self).__init__()
@@ -32,8 +36,43 @@ class Net(nn.Module):
 
         return x
 
+##########
+# model 2
+##########
+
+# 생략
+
+##########
+# model 3
+##########
+'''
+from efficientnet_pytorch import EfficientNet
+
+class pre_EffNet(nn.Module):
+    def __init__(self, num_classes):
+        super(pre_EffNet, self).__init__()
+        # EfficientNetB3 불러오기
+        self.model = EfficientNet.from_pretrained('efficientnet-b3')
+        
+        # 첫 번째 합성곱층의 입력 채널 수를 1로 변경
+        self.model._conv_stem = nn.Conv2d(
+            in_channels=1,  # 1채널 입력
+            out_channels=self.model._conv_stem.out_channels,
+            kernel_size=3,
+            stride=2,
+            padding=1,
+            bias=False
+        )
+
+        
+        self.model._fc = nn.Linear(self.model._fc.in_features, num_classes)
+
+    def forward(self, x):
+        return self.model(x)
+'''
 
 model = Net().to('cuda')
+#model = pre_EffNet(num_classes=1).to('cuda') # 마지막 fully connected layer의 출력 채널 수 
 summary(model, (1,26,34))
 '''
 ----------------------------------------------------------------

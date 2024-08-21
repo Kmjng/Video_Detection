@@ -15,7 +15,7 @@ import torch.nn as nn # 신경망 모듈 제공
 from torchvision.transforms import transforms
 from torch.utils.data import DataLoader # for data loading 
 from data_loader import eyes_dataset
-from model import Net
+from model import  Net # pre_EffNet # ,
 import torch.optim as optim # optimizer
 import torchvision 
 
@@ -91,8 +91,29 @@ train_dataloader = DataLoader(train_dataset, batch_size=32, shuffle=True, num_wo
 총 배치 수 약 81(2586 / 32)
 '''
 
+##########
+# model 1
+##########
+ 
 model = Net()
 model.to('cuda')
+ 
+##########
+# model 2 (pretrained-EfficientNet) - x (1 channel)
+##########
+'''
+from efficientnet_pytorch import EfficientNet
+model = EfficientNet.from_pretrained('efficientnet-b3')
+model._fc = torch.nn.Linear(model._fc.in_features, 2) # 2: num_classes
+'''
+
+##########
+# model 3 (pretrained-EfficientNet)
+##########
+'''
+model = pre_EffNet(num_classes=1)
+model.to('cuda')
+'''
 
 criterion = nn.BCEWithLogitsLoss() # 손실함수
 optimizer = optim.Adam(model.parameters(), lr=0.0001) # optimizer
@@ -103,7 +124,12 @@ epochs = 30
 # 텐서보드로 로그 기록
 from torch.utils.tensorboard import SummaryWriter
 # from tensorboardX import SummaryWriter
-writer = SummaryWriter('C:/ITWILL/Video_Detection/detection/Pytorch/pytorch_code/logs')
+# ★★★★★★★★★
+writer = SummaryWriter('C:/ITWILL/Video_Detection/detection/Pytorch/pytorch_code/logs/cnn_model_log/train')
+
+# dummy_input 생성 및 add_graph 로그 저장 
+dummy_input = torch.randn(1, 1, 26, 34).to('cuda')  # 입력 크기와 일치해야 함
+writer.add_graph(model, dummy_input)
 
 
 for epoch in range(epochs):
@@ -143,7 +169,7 @@ for epoch in range(epochs):
         
 
 print("learning finish")
-
+# ★★★★★★★★★
 torch.save(model.state_dict(), PATH+'cnn_train.pth')
 
 # SummaryWriter 닫기
