@@ -15,7 +15,7 @@ import torch.nn as nn # 신경망 모듈 제공
 from torchvision.transforms import transforms
 from torch.utils.data import DataLoader # for data loading 
 from data_loader import eyes_dataset
-from model import  Net # pre_EffNet # ,
+from model import  pre_EffNet # ,Net # 
 import torch.optim as optim # optimizer
 import torchvision 
 
@@ -94,10 +94,10 @@ train_dataloader = DataLoader(train_dataset, batch_size=32, shuffle=True, num_wo
 ##########
 # model 1
 ##########
- 
+'''
 model = Net()
 model.to('cuda')
- 
+'''
 ##########
 # model 2 (pretrained-EfficientNet) - x (1 channel)
 ##########
@@ -110,10 +110,10 @@ model._fc = torch.nn.Linear(model._fc.in_features, 2) # 2: num_classes
 ##########
 # model 3 (pretrained-EfficientNet)
 ##########
-'''
+
 model = pre_EffNet(num_classes=1)
 model.to('cuda')
-'''
+
 
 criterion = nn.BCEWithLogitsLoss() # 손실함수
 optimizer = optim.Adam(model.parameters(), lr=0.0001) # optimizer
@@ -121,15 +121,20 @@ optimizer = optim.Adam(model.parameters(), lr=0.0001) # optimizer
 epochs = 30
 
 
+
+
 # 텐서보드로 로그 기록
 from torch.utils.tensorboard import SummaryWriter
 # from tensorboardX import SummaryWriter
 # ★★★★★★★★★
-writer = SummaryWriter('C:/ITWILL/Video_Detection/detection/Pytorch/pytorch_code/logs/cnn_model_log/train')
+writer = SummaryWriter('C:/ITWILL/Video_Detection/detection/Pytorch/pytorch_code/logs/pre_Eff/train')
 
-# dummy_input 생성 및 add_graph 로그 저장 
+# dummy_input 생성 및 add_graph 로그 기록
 dummy_input = torch.randn(1, 1, 26, 34).to('cuda')  # 입력 크기와 일치해야 함
 writer.add_graph(model, dummy_input)
+
+# 학습 전 GPU 메모리 사용량 측정
+start_memory = torch.cuda.memory_allocated()
 
 
 for epoch in range(epochs):
@@ -159,18 +164,24 @@ for epoch in range(epochs):
     # 에폭이 끝난 후, 평균 손실과 정확도 계산
     avg_loss = running_loss / len(train_dataloader) # 손실/전체 배치 수
     avg_acc = running_acc / len(train_dataloader)
-    # 로그 기록
+    # 성능 로그 기록
     writer.add_scalar('Loss/train', avg_loss, epoch)
     writer.add_scalar('Accuracy/train', avg_acc, epoch)
-
+    
+    
    
     print('epoch: [%d/%d] train_loss: %.5f train_acc: %.5f' % (
         epoch + 1, epochs, avg_loss, avg_acc))
         
+# 학습 후 GPU 메모리 사용량 측정
+end_memory = torch.cuda.memory_allocated()
 
 print("learning finish")
+# 전체 학습에 사용된 메모리 출력
+print(f'Total memory used during training: {end_memory - start_memory} bytes')
 # ★★★★★★★★★
-torch.save(model.state_dict(), PATH+'cnn_train.pth')
+#torch.save(model.state_dict(), PATH+'cnn_train.pth')
+torch.save(model.state_dict(), PATH+'pre_Eff_train.pth')
 
 # SummaryWriter 닫기
 writer.close()

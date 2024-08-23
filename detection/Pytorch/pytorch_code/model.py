@@ -14,7 +14,7 @@ from torchsummary import summary
 ##########
 # model 1
 ##########
-
+'''
 class Net(nn.Module):
     def __init__(self):
         super(Net, self).__init__()
@@ -35,7 +35,7 @@ class Net(nn.Module):
 
 
         return x
-
+'''
 ##########
 # model 2
 ##########
@@ -45,7 +45,7 @@ class Net(nn.Module):
 ##########
 # model 3
 ##########
-'''
+
 from efficientnet_pytorch import EfficientNet
 
 class pre_EffNet(nn.Module):
@@ -69,10 +69,10 @@ class pre_EffNet(nn.Module):
 
     def forward(self, x):
         return self.model(x)
-'''
 
-model = Net().to('cuda')
-#model = pre_EffNet(num_classes=1).to('cuda') # 마지막 fully connected layer의 출력 채널 수 
+
+#model = Net().to('cuda')
+model = pre_EffNet(num_classes=1).to('cuda') # 마지막 fully connected layer의 출력 채널 수 
 summary(model, (1,26,34))
 '''
 ----------------------------------------------------------------
@@ -92,5 +92,45 @@ Input size (MB): 0.00
 Forward/backward pass size (MB): 0.37
 Params size (MB): 3.36
 Estimated Total Size (MB): 3.74
+----------------------------------------------------------------
+'''
+
+'''
+Loaded pretrained weights for efficientnet-b3
+----------------------------------------------------------------
+        Layer (type)               Output Shape         Param #
+================================================================
+            Conv2d-1           [-1, 40, 13, 17]             360
+       BatchNorm2d-2           [-1, 40, 13, 17]              80
+MemoryEfficientSwish-3           [-1, 40, 13, 17]               0
+         ZeroPad2d-4           [-1, 40, 15, 19]               0
+Conv2dStaticSamePadding-5           [-1, 40, 13, 17]             360
+       BatchNorm2d-6           [-1, 40, 13, 17]              80
+MemoryEfficientSwish-7           [-1, 40, 13, 17]               0
+          Identity-8             [-1, 40, 1, 1]               0
+Conv2dStaticSamePadding-9             [-1, 10, 1, 1]             410
+MemoryEfficientSwish-10             [-1, 10, 1, 1]               0
+         Identity-11             [-1, 10, 1, 1]               0
+Conv2dStaticSamePadding-12             [-1, 40, 1, 1]             440
+         Identity-13           [-1, 40, 13, 17]               0
+Conv2dStaticSamePadding-14           [-1, 24, 13, 17]             960
+      BatchNorm2d-15           [-1, 24, 13, 17]              48
+      MBConvBlock-16           [-1, 24, 13, 17]               0
+        ZeroPad2d-17           [-1, 24, 15, 19]               0
+Conv2dStaticSamePadding-18           [-1, 24, 13, 17]             216
+      BatchNorm2d-19           [-1, 24, 13, 17]              48
+MemoryEfficientSwish-20           [-1, 24, 13, 17]               0
+         Identity-21             [-1, 24, 1, 1]               0
+         <..생략..>
+         
+================================================================
+Total params: 10,697,049
+Trainable params: 10,697,049
+Non-trainable params: 0
+----------------------------------------------------------------
+Input size (MB): 0.00
+Forward/backward pass size (MB): 9.55
+Params size (MB): 40.81
+Estimated Total Size (MB): 50.36
 ----------------------------------------------------------------
 '''

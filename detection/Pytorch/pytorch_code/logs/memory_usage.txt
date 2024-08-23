@@ -1,0 +1,11 @@
+<CNN - train > 
+Total memory used during training: 20,130,816 bytes 
+<CNN - test > 
+Total memory used during validation: 1024 bytes
+<pre_Eff - train> 
+Total memory used during training: 135,833,600 bytes
+<pre_Eff - test > 
+Total memory used during validation: 3584 bytes
+
+
+0.000001 

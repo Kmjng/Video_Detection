@@ -12,7 +12,7 @@ import torch.nn as nn
 from torchvision.transforms import transforms
 from torch.utils.data import DataLoader 
 from data_loader import eyes_dataset # ★외부 모듈
-from model import Net # , pre_EffNet  
+from model import pre_EffNet  # Net # , 
 import torch.optim as optim
 
     
@@ -30,7 +30,8 @@ def accuracy(y_pred, y_test):
 
 #PATH = 'C:/Users/minjeong/Documents/itwill/Video_Detection/detection/Pytorch/pytorch_code/weights/trained.pth'
 # ★★★★★★★★★
-PATH = 'C:/ITWILL/Video_Detection/detection/Pytorch/pytorch_code/weights/cnn_train.pth'
+#PATH = 'C:/ITWILL/Video_Detection/detection/Pytorch/pytorch_code/weights/cnn_train.pth'
+PATH = 'C:/ITWILL/Video_Detection/detection/Pytorch/pytorch_code/weights/pre_Eff_train.pth'
 
 #path1 = r'C:/Users/minjeong/Documents/itwill/Video_Detection/detection/Pytorch/dataset/'
 path1 = r'C:/ITWILL/Video_Detection/detection/Pytorch/dataset/'
@@ -45,8 +46,8 @@ test_dataset = eyes_dataset(x_test, y_test, transform=test_transform)
 
 test_dataloader = DataLoader(test_dataset, batch_size=1, shuffle=False, num_workers=4)
 
-model = Net()
-#model = pre_EffNet(1)
+#model = Net()
+model = pre_EffNet(1)
 
 model.to('cuda')
 model.load_state_dict(torch.load(PATH)) # train된 모델의 가중치 로드
@@ -61,10 +62,13 @@ criterion = nn.BCEWithLogitsLoss()
 from torch.utils.tensorboard import SummaryWriter
 # from tensorboardX import SummaryWriter
 # ★★★★★★★★★
-writer = SummaryWriter('C:/ITWILL/Video_Detection/detection/Pytorch/pytorch_code/logs/cnn_model_log/test')
+writer = SummaryWriter('C:/ITWILL/Video_Detection/detection/Pytorch/pytorch_code/logs/pre_Eff/test')
 
 
+# 학습 전 GPU 메모리 사용량 측정
+start_memory = torch.cuda.memory_allocated()
 
+    
 with torch.no_grad():
     total_loss = 0.0
     total_acc = 0.0
@@ -87,15 +91,20 @@ with torch.no_grad():
     # 평균 손실과 정확도 계산
     avg_loss = total_loss / count
     avg_acc = total_acc / count
+    
     # 텐서보드에 기록
     writer.add_scalar('Loss/validation', avg_loss)
     writer.add_scalar('Accuracy/validation', avg_acc)
-
+    
     print(f'Validation Loss: {avg_loss:.5f}')
     print(f'Validation Accuracy: {avg_acc:.5f}%')
-    print('average acc: %.5f' % (total_acc/count),'%')
-    
-print('Validation finished!')
+        
+# 학습 후 GPU 메모리 사용량 측정
+end_memory = torch.cuda.memory_allocated()
+
+print("Validation finish")
+# 전체 학습에 사용된 메모리 출력
+print(f'Total memory used during validation: {end_memory - start_memory} bytes')
 
 # SummaryWriter 닫기
 writer.close()
