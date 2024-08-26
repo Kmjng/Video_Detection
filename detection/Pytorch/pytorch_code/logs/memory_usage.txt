@@ -1,11 +1,14 @@
 <CNN - train > 
-Total memory used during training: 20,130,816 bytes 
+(GPU)Total memory used during training: 20,130,816 bytes 
 <CNN - test > 
-Total memory used during validation: 1024 bytes
+(GPU)Total memory used during validation: 1024 bytes
 <pre_Eff - train> 
-Total memory used during training: 135,833,600 bytes
+(GPU)Total memory used during training: 135,833,600 bytes
 <pre_Eff - test > 
-Total memory used during validation: 3584 bytes
+(GPU)Total memory used during validation: 3584 bytes
 
+<CNN2 - train > 
+(GPU) Total memory used during validation: 3,522,048 bytes
+(CPU) Total memory used during validation: 1,085,440 bytes
 
 0.000001 

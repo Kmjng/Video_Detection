@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Created on Wed Jul 17 17:56:08 2024
-
-@author: minjeong
+<<<train>>>
 
 tensorboard --logdir=C:/ITWILL/Video_Detection/detection/Pytorch/pytorch_code/logs
 
@@ -15,17 +13,15 @@ import torch.nn as nn # 신경망 모듈 제공
 from torchvision.transforms import transforms
 from torch.utils.data import DataLoader # for data loading 
 from data_loader import eyes_dataset
-from model import  pre_EffNet # ,Net # 
+from model import Net2 #  pre_EffNet # ,
 import torch.optim as optim # optimizer
 import torchvision 
 
 # 모델링 파라미터 저장
-#PATH = 'C:/Users/minjeong/Documents/itwill/Video_Detection/detection/Pytorch/pytorch_code/weights/trained.pth'
 PATH = 'C:/ITWILL/Video_Detection/detection/Pytorch/pytorch_code/weights/'
 
 
 # 데이터 로드
-#path1 = r'C:/Users/minjeong/Documents/itwill/Video_Detection/detection/Pytorch/dataset/'
 path1 = r"C:/ITWILL/Video_Detection/detection/Pytorch/dataset/"
 x_train = np.load(path1 + 'x_train.npy').astype(np.float32)  # (2586, 26, 34, 1)
 y_train = np.load(path1 + 'y_train.npy').astype(np.float32)  # (2586, 1)
@@ -111,7 +107,14 @@ model._fc = torch.nn.Linear(model._fc.in_features, 2) # 2: num_classes
 # model 3 (pretrained-EfficientNet)
 ##########
 
-model = pre_EffNet(num_classes=1)
+#model = pre_EffNet(num_classes=1)
+#model.to('cuda')
+
+##########
+# model 4 (Net2) - fusing available 
+##########
+
+model = Net2()
 model.to('cuda')
 
 
@@ -127,7 +130,7 @@ epochs = 30
 from torch.utils.tensorboard import SummaryWriter
 # from tensorboardX import SummaryWriter
 # ★★★★★★★★★
-writer = SummaryWriter('C:/ITWILL/Video_Detection/detection/Pytorch/pytorch_code/logs/pre_Eff/train')
+writer = SummaryWriter('C:/ITWILL/Video_Detection/detection/Pytorch/pytorch_code/logs/cnn2/train')
 
 # dummy_input 생성 및 add_graph 로그 기록
 dummy_input = torch.randn(1, 1, 26, 34).to('cuda')  # 입력 크기와 일치해야 함
@@ -181,7 +184,7 @@ print("learning finish")
 print(f'Total memory used during training: {end_memory - start_memory} bytes')
 # ★★★★★★★★★
 #torch.save(model.state_dict(), PATH+'cnn_train.pth')
-torch.save(model.state_dict(), PATH+'pre_Eff_train.pth')
+torch.save(model.state_dict(), PATH+'cnn2_train.pth')
 
 # SummaryWriter 닫기
 writer.close()
