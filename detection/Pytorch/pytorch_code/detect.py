@@ -8,7 +8,7 @@ Created on Wed Jul 17 17:59:01 2024
 import cv2
 import dlib 
 import numpy as np
-from model import Net
+from model import Net2
 import torch
 from imutils import face_utils
 
@@ -19,21 +19,18 @@ import threading  # 추가된 모듈 (winsound를 프로그램과 비동기식�
 
 
 IMG_SIZE = (34,26)
-#PATH = 'C:/Users/minjeong/Documents/itwill/Video_Detection/detection/Pytorch/pytorch_code/weights/trained.pth'
-#ALERT_FILE = 'C:/Users/minjeong/Documents/itwill/Video_Detection/detection/Pytorch/message'
-#ALERT_SOUND = 'C:/Users/minjeong/Documents/itwill/Video_Detection/detection/Pytorch/sound/notify.wav'
 
-PATH = 'C:/ITWILL/Video_Detection/detection/Pytorch/pytorch_code/weights/cnn_train.pth'
+PATH = 'C:/ITWILL/Video_Detection/detection/Pytorch/pytorch_code/weights/quantized_model.pth'
 ALERT_FILE =  'C:/ITWILL/Video_Detection/detection/Pytorch/message'
 ALERT_SOUND = 'C:/ITWILL/Video_Detection/detection/Pytorch/sound/notify.wav'
 
  
 detector = dlib.get_frontal_face_detector() # 얼굴을 검출하는 dlib의 얼굴 검출기.
-#predictor = dlib.shape_predictor('C:/Users/minjeong/Documents/itwill/data/shape_predictor_68_face_landmarks.dat/shape_predictor_68_face_landmarks.dat')
 predictor = dlib.shape_predictor('C:/ITWILL/Video_Detection/detection/shape_predictor_68_face_landmarks.dat')
 # 얼굴의 랜드마크를 예측하는 dlib의 랜드마크 예측기
-model = Net()
-model.load_state_dict(torch.load(PATH))
+model = Net2()
+#model.load_state_dict(torch.load(PATH)) # pth에 저장된 가중치 업로드 
+model = torch.jit.load(PATH) 
 model.eval()
 
 
@@ -84,7 +81,6 @@ alert_playing = False  # 알람이 울리는 상태를 추적하기 위한 변�
 
 
 # 비디오 캡처 객체를 저장된 비디오 파일로 초기화
-#video_path = 'C:/Users/minjeong/Documents/itwill/Video_Detection/detection/Pytorch/videos/1.mp4'
 video_path = 'C:/ITWILL/Video_Detection/detection/Pytorch/videos/3.mp4'
 cap = cv2.VideoCapture(video_path)
 

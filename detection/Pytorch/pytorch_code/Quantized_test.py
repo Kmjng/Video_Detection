@@ -5,7 +5,7 @@
 Quantization of cnn
 for test
 정적 양자화
- 이미 학습된 모델을 양자화
+ (이미 학습된 모델을 양자화한다.)
 """
 
 
@@ -33,8 +33,6 @@ def accuracy(y_pred, y_test):
 
 
 
-
-#path1 = r'C:/Users/minjeong/Documents/itwill/Video_Detection/detection/Pytorch/dataset/'
 path1 = r'C:/ITWILL/Video_Detection/detection/Pytorch/dataset/'
 x_test = np.load(path1+ 'x_val.npy').astype(np.float32)  # (288, 26, 34, 1)
 y_test = np.load(path1+ 'y_val.npy').astype(np.float32)  # (288, 1)
@@ -87,7 +85,7 @@ def calibrate(model, dataloader):
             inputs = inputs.to('cpu')  # Ensure inputs are on CPU
             model(inputs)
 
-# Calibrate with test data (or representative data)
+# Calibrate with test data 
 calibrate(model, test_dataloader)
 
 # Convert the model
@@ -107,7 +105,7 @@ print(torch.__version__)  # PyTorch 버전 확인 # 2.0.0
 
 # -----------------------------------------------------
 loaded_quantized_model = torch.jit.load(quantized_model_path)
-# Evaluate the quantized model
+# quantized model 평가
 def evaluate(model, dataloader):
     model.eval()
     all_preds = []
@@ -137,9 +135,6 @@ process = psutil.Process(os.getpid())
 # 학습 전 CPU 메모리 사용량 측정
 start_memory = process.memory_info().rss  # 메모리 사용량 (바이트 단위)
 
-
-# Compute accuracy on the test set
-
 test_accuracy = evaluate(loaded_quantized_model, test_dataloader)
 
 # 학습 후 메모리 사용량 측정
@@ -149,63 +144,3 @@ print("--Validation finish--")
 # 전체 학습에 사용된 메모리 출력
 print(f'(Quantized) Total memory used during validation: {end_memory - start_memory} bytes')
 
-
-'''
-# 텐서보드로 로그 기록
-from torch.utils.tensorboard import SummaryWriter
-# from tensorboardX import SummaryWriter
-# ★★★★★★★★★
-writer = SummaryWriter('C:/ITWILL/Video_Detection/detection/Pytorch/pytorch_code/logs/quantized/cnn2/test')
-
-
-# 현재 프로세스의 메모리 사용량 측정
-import psutil
-import os
-
-process = psutil.Process(os.getpid())
-# 학습 전 CPU 메모리 사용량 측정
-start_memory = process.memory_info().rss  # 메모리 사용량 (바이트 단위)
-
-
-model.eval() 
-
-with torch.no_grad():
-    total_loss = 0.0
-    total_acc = 0.0
-    acc = 0.0
-    for i, test_data in enumerate(test_dataloader, 0):
-        data, labels = test_data[0].to('cpu'), test_data[1].to('cpu')
-
-        data = data.transpose(1, 3).transpose(2, 3)
-
-        outputs = model(data)
-
-        acc = accuracy(outputs, labels)
-        total_acc += acc
-        
-        # 손실 계산
-        loss = criterion(outputs, labels)
-        total_loss += loss.item()
-        count = i
-    
-    # 평균 손실과 정확도 계산
-    avg_loss = total_loss / count
-    avg_acc = total_acc / count
-    
-    # 텐서보드에 기록
-    writer.add_scalar('Loss/validation', avg_loss)
-    writer.add_scalar('Accuracy/validation', avg_acc)
-    
-    print(f'Validation Loss: {avg_loss:.5f}')
-    print(f'Validation Accuracy: {avg_acc:.5f}%')
-        
-# 학습 후 메모리 사용량 측정
-end_memory = process.memory_info().rss  # 메모리 사용량 (바이트 단위)
-
-print("Validation finish")
-# 전체 학습에 사용된 메모리 출력
-print(f'(Quantized) Total memory used during validation: {end_memory - start_memory} bytes')
-
-# SummaryWriter 닫기
-writer.close()
-'''
